@@ -16,7 +16,18 @@ const app = express();
 
 app.use([cors(), express.json()]);
 
+app.post('/participantes', (req, res)=>{
 
+    if(!req.body.name){
+        res.status(422).send("Nome invalido!");
+        return;
+    }
+
+    const promise = db.collection('participantes').insertOne(req.body);
+    promise.then(res.status(201).send('criado com sucesso!'));
+
+    promise.catch(err=> res.sendStatus(500));
+})
 
 app.get('/participantes', (req, res)=>{
 
