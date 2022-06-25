@@ -98,13 +98,13 @@ app.post('/messages', async (req, res) => {
 
 })
 
-// app.get('/messages', (req, res) => {
+app.get('/messages', (req, res) => {
 
-//     const promise = db.collection('mensagens').find({}).toArray();
-//     promise.then((mens) => { res.status(200).send(mens) });
-//     promise.catch((err) => res.sendStatus(200));
+    const promise = db.collection('mensagens').find({}).toArray();
+    promise.then((mens) => { res.status(200).send(mens) });
+    promise.catch((err) => res.sendStatus(200));
 
-// })
+})
 
 // app.delete('/messages', async (req, res) => {
 
