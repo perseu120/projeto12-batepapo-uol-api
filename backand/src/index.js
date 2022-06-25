@@ -98,29 +98,29 @@ app.post('/messages', async (req, res) => {
 
 })
 
-app.get('/messages', (req, res) => {
+// app.get('/messages', (req, res) => {
 
-    const promise = db.collection('mensagens').find({}).toArray();
-    promise.then((mens) => { res.status(200).send(mens) });
-    promise.catch((err) => res.sendStatus(200));
+//     const promise = db.collection('mensagens').find({}).toArray();
+//     promise.then((mens) => { res.status(200).send(mens) });
+//     promise.catch((err) => res.sendStatus(200));
 
-})
+// })
 
-app.delete('/messages', async (req, res) => {
+// app.delete('/messages', async (req, res) => {
 
-    try {
-        await mongoClient.connect();
-        const db = mongoClient.db("apiUOL")
-        const usersColection = db.collection("mensagens");
-        await usersColection.deleteMany({ "to": "Asta" });
+//     try {
+//         await mongoClient.connect();
+//         const db = mongoClient.db("apiUOL")
+//         const usersColection = db.collection("mensagens");
+//         await usersColection.deleteMany({ "to": "Asta" });
 
-        res.sendStatus(200)
-    } catch (error) {
-        res.status(500).send(error)
-        mongoClient.close()
-    }
+//         res.sendStatus(200)
+//     } catch (error) {
+//         res.status(500).send(error)
+//         mongoClient.close()
+//     }
 
-})
+// })
 
 app.listen(5000, () => {
     console.log(chalk.blue("servidor rodando"));
