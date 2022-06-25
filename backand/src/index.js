@@ -32,7 +32,10 @@ app.post('/participantes', async (req, res) => {
         }
 
         const promise = db.collection('participantes').insertOne({ name: req.body.name, 'lastStatus': Date.now() });
-        promise.then(res.sendStatus(201));
+        
+        promise.then(
+            await db.collection('mensagens').insertOne({ from: req.body.name, to: "Todos", text: 'entra na sala...', type: 'status', time: dayjs().format('HH:mm:ss') }),
+            res.sendStatus(201));
 
         promise.catch(err => res.sendStatus(500));
 
