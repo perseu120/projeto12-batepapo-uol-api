@@ -91,8 +91,8 @@ app.post('/messages', async (req, res) => {
             return;
         }
 
-    } catch {
-
+    } catch(error) {
+        res.status(500).send(error)
     }
 
     const promise = db.collection('mensagens').insertOne({ from: req.headers.user, to: req.body.to, text: req.body.text, type: req.body.type, time: dayjs().format('HH:mm:ss') })
@@ -107,6 +107,24 @@ app.get('/messages', (req, res) => {
     const promise = db.collection('mensagens').find({$or: [{"to": "Todos"}, {"from": user}, {"to":user }  ] }).toArray();
     promise.then((mens) => { res.status(200).send(mens) });
     promise.catch((err) => res.sendStatus(200));
+
+})
+
+app.post('/status', async (req, res) =>{
+
+    const user = req.headers.user;
+    try {
+        const name = await db.collection('participantes').findOne({ name: user });
+        if (!name) {
+            res.sendStatus(404);
+            return;
+        }
+
+        await db.collection('participantes').updateOne({name: user}, {$set:{'lastStatus': Date.now()}});
+        res.send( 200);
+    } catch(error) {
+        res.status(500).send(error)
+    }
 
 })
 
@@ -125,6 +143,11 @@ app.delete('/messages', async (req, res) => {
     }
 
 })
+
+setInterval(()=>{
+
+
+}, 15000);
 
 app.listen(5000, () => {
     console.log(chalk.blue("servidor rodando"));
