@@ -102,8 +102,9 @@ app.post('/messages', async (req, res) => {
 })
 
 app.get('/messages', (req, res) => {
-
-    const promise = db.collection('mensagens').find({}).toArray();
+    const user = req.headers.user;
+    console.log(user);
+    const promise = db.collection('mensagens').find({$or: [{"to": "Todos"}, {"from": user}, {"to":user }  ] }).toArray();
     promise.then((mens) => { res.status(200).send(mens) });
     promise.catch((err) => res.sendStatus(200));
 
