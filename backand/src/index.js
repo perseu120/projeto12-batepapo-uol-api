@@ -3,8 +3,11 @@ import cors from "cors";
 import chalk from "chalk";
 import { MongoClient, ObjectId } from "mongodb";
 import dayjs from 'dayjs';
+import dotenv from "dotenv"
 
-const mongoClient = new MongoClient('mongodb://127.0.0.1:27017');
+dotenv.config()
+
+const mongoClient = new MongoClient(process.env.URL_MONGO);
 let db = null;
 
 const promise = mongoClient.connect();
@@ -103,7 +106,6 @@ app.post('/messages', async (req, res) => {
 
 app.get('/messages', (req, res) => {
     const user = req.headers.user;
-    console.log(user);
     const promise = db.collection('mensagens').find({ $or: [{ "to": "Todos" }, { "from": user }, { "to": user }] }).toArray();
     promise.then((mens) => { res.status(200).send(mens) });
     promise.catch((err) => res.sendStatus(200));
@@ -158,8 +160,8 @@ setInterval(async () => {
         });
 
         usuarioParaDeletar.map( async (items)=>{
-            console.log(items._id);
             await db.collection("participantes").deleteOne({ _id: items._id })
+            await db.collection('mensagens').insertOne({ from: items.name, to: "Todos", text: 'sai da sala...', type: 'status', time: dayjs().format('HH:mm:ss') })
         })
         
 

@@ -1,14 +1,14 @@
 #frontEnd
-/tweteroo
+/front-bate-papo-uol-main
 
 # dependencies
 /node_modules
-/front-bate-papo-uol-main
 /.pnp
 .pnp.js
 
 # testing
 /coverage
+.env
 
 # production
 /build
