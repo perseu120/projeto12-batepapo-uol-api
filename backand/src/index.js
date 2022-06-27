@@ -1,9 +1,14 @@
 import express from "express";
 import cors from "cors";
 import chalk from "chalk";
+import joi from 'joi';
 import { MongoClient, ObjectId } from "mongodb";
 import dayjs from 'dayjs';
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+
+const userSchema = joi.object({
+    name: joi.string().required()
+  });
 
 dotenv.config()
 
@@ -20,10 +25,16 @@ const app = express();
 
 app.use([cors(), express.json()]);
 
-app.post('/participantes', async (req, res) => {
+app.post('/participants', async (req, res) => {
 
     if (!req.body.name) {
         res.status(422).send("Nome invalido!");
+        return;
+    }
+    const validacao = userSchema.validate(req.body.name);
+
+    if (validacao.error) {
+        console.log(validacao.error.details)
         return;
     }
 
@@ -48,7 +59,7 @@ app.post('/participantes', async (req, res) => {
 
 })
 
-app.delete('/participantes/:id', async (req, res) => {
+app.delete('/participants/:id', async (req, res) => {
     const { id } = req.params;
     try {
         await mongoClient.connect();
@@ -63,7 +74,7 @@ app.delete('/participantes/:id', async (req, res) => {
     }
 });
 
-app.get('/participantes', (req, res) => {
+app.get('/participants', (req, res) => {
 
     const promise = db.collection('participantes').find({}).toArray();
     promise.then(participantes => res.status(200).send(participantes));
