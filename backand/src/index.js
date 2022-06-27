@@ -8,7 +8,14 @@ import dotenv from "dotenv";
 
 const userSchema = joi.object({
     name: joi.string().required()
-  });
+});
+
+const mensagensScrema = joi.object({
+    to:  joi.string().required(),
+    text:  joi.string().required(),
+    type:  joi.string().valid("private_message", "message").required()
+})
+
 
 dotenv.config()
 
@@ -84,19 +91,27 @@ app.get('/participants', (req, res) => {
 
 app.post('/messages', async (req, res) => {
 
-    const { to, text, type } = req.body;
-    if (!text) {
-        res.status(422).send("a mensagem não pode esta vazio!");
+    // const { to, text, type } = req.body;
+    // if (!text) {
+    //     res.status(422).send("a mensagem não pode esta vazio!");
+    //     return;
+    // }
+    // if (!to) {
+    //     res.status(422).send("mensagem sem destino!");
+    //     return;
+    // }
+    // if (type !== 'message' && type !== 'private_message') {
+    //     res.status(422).send("o tipo da mensagem é invalido!");
+    //     return;
+    // }
+    const validacao = mensagensScrema.validate(req.body);
+
+    if (validacao.error) {
+        console.error(validacao.error.details)
+        res.sendStatus(500);
         return;
     }
-    if (!to) {
-        res.status(422).send("mensagem sem destino!");
-        return;
-    }
-    if (type !== 'message' && type !== 'private_message') {
-        res.status(422).send("o tipo da mensagem é invalido!");
-        return;
-    }
+
     try {
         const name = await db.collection('participantes').findOne({ name: req.headers.user });
 
