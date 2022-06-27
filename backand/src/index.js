@@ -27,10 +27,10 @@ app.use([cors(), express.json()]);
 
 app.post('/participants', async (req, res) => {
 
-    if (!req.body.name) {
-        res.status(422).send("Nome invalido!");
-        return;
-    }
+    // if (!req.body.name) {
+    //     res.status(422).send("Nome invalido!");
+    //     return;
+    // }
     const validacao = userSchema.validate(req.body.name);
 
     if (validacao.error) {
