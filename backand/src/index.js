@@ -106,8 +106,16 @@ app.post('/messages', async (req, res) => {
 
 app.get('/messages', (req, res) => {
     const user = req.headers.user;
+    const limit = parseInt(req.query.limit);
+    if(!limit){
+        const promise = db.collection('mensagens').find({ $or: [{ "to": "Todos" }, { "from": user }, { "to": user }] }).toArray();
+        promise.then((mens) => { res.status(200).send(mens) });
+        promise.catch((err) => res.sendStatus(200));
+        return;
+    }
+    
     const promise = db.collection('mensagens').find({ $or: [{ "to": "Todos" }, { "from": user }, { "to": user }] }).toArray();
-    promise.then((mens) => { res.status(200).send(mens) });
+    promise.then((mens) => { res.status(200).send(mens.slice(-limit)) });
     promise.catch((err) => res.sendStatus(200));
 
 })
@@ -147,7 +155,6 @@ app.delete('/messages', async (req, res) => {
 })
 
 setInterval(async () => {
-    // "lastStatus":{$ite: 1656090371432}
     const dataAtual = Date.now();
     const usuarioParaDeletar = [];
     try {
