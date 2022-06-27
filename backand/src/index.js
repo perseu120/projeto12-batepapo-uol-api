@@ -32,7 +32,7 @@ app.post('/participantes', async (req, res) => {
         }
 
         const promise = db.collection('participantes').insertOne({ name: req.body.name, 'lastStatus': Date.now() });
-        
+
         promise.then(
             await db.collection('mensagens').insertOne({ from: req.body.name, to: "Todos", text: 'entra na sala...', type: 'status', time: dayjs().format('HH:mm:ss') }),
             res.sendStatus(201));
@@ -79,19 +79,19 @@ app.post('/messages', async (req, res) => {
         res.status(422).send("mensagem sem destino!");
         return;
     }
-    if(type !== 'message' && type !== 'private_message'){
+    if (type !== 'message' && type !== 'private_message') {
         res.status(422).send("o tipo da mensagem é invalido!");
         return;
     }
     try {
         const name = await db.collection('participantes').findOne({ name: req.headers.user });
-       
+
         if (!name) {
             res.status(422).send("esse usuario não existe!");
             return;
         }
 
-    } catch(error) {
+    } catch (error) {
         res.status(500).send(error)
     }
 
@@ -104,13 +104,13 @@ app.post('/messages', async (req, res) => {
 app.get('/messages', (req, res) => {
     const user = req.headers.user;
     console.log(user);
-    const promise = db.collection('mensagens').find({$or: [{"to": "Todos"}, {"from": user}, {"to":user }  ] }).toArray();
+    const promise = db.collection('mensagens').find({ $or: [{ "to": "Todos" }, { "from": user }, { "to": user }] }).toArray();
     promise.then((mens) => { res.status(200).send(mens) });
     promise.catch((err) => res.sendStatus(200));
 
 })
 
-app.post('/status', async (req, res) =>{
+app.post('/status', async (req, res) => {
 
     const user = req.headers.user;
     try {
@@ -120,9 +120,9 @@ app.post('/status', async (req, res) =>{
             return;
         }
 
-        await db.collection('participantes').updateOne({name: user}, {$set:{'lastStatus': Date.now()}});
-        res.send( 200);
-    } catch(error) {
+        await db.collection('participantes').updateOne({ name: user }, { $set: { 'lastStatus': Date.now() } });
+        res.send(200);
+    } catch (error) {
         res.status(500).send(error)
     }
 
@@ -144,8 +144,28 @@ app.delete('/messages', async (req, res) => {
 
 })
 
-setInterval(()=>{
+setInterval(async () => {
+    // "lastStatus":{$ite: 1656090371432}
+    const dataAtual = Date.now();
+    const usuarioParaDeletar = [];
+    try {
+        const name  = await db.collection('participantes').find({}).toArray();
+        
+        name.map((items) => {
+            if ((dataAtual - items.lastStatus) >= 10000) {
+                usuarioParaDeletar.push(items);
+            }
+        });
 
+        usuarioParaDeletar.map( async (items)=>{
+            console.log(items._id);
+            await db.collection("participantes").deleteOne({ _id: items._id })
+        })
+        
+
+    } catch (error) {
+        console.log(error);
+    }
 
 }, 15000);
 
